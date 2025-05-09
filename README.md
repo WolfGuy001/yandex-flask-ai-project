@@ -64,7 +64,7 @@ pip install -r requirements.txt
 
 4. Установите и настройте Ollama для работы с моделями ИИ:
 ```
-# Инструкции по установке Ollama смотрите на https://ollama.ai/
+Инструкции по установке Ollama смотрите на https://ollama.ai/
 ```
 
 5. Запустите приложение:
