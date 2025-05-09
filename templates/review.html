@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <!-- Левая колонка: ввод текста -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3>Новое сочинение</h3>
+            </div>
+            <div class="card-body">
+                {% if current_user.is_authenticated %}
+                    <form method="post" action="/review">
+                        <div class="form-group">
+                            <label for="task">Задание:</label>
+                            <textarea class="form-control" id="task" name="task" rows="3" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="source_text">Исходный текст:</label>
+                            <textarea class="form-control" id="source_text" name="source_text" rows="4" placeholder="Если исходного текста нет, напишите 'нет'"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="essay">Текст сочинения:</label>
+                            <textarea class="form-control" id="essay" name="text" rows="10" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Отправить на рецензию</button>
+                    </form>
+                {% else %}
+                    <div class="alert alert-warning">
+                        <h4>Требуется авторизация</h4>
+                        <p>Чтобы отправить сочинение на рецензию, необходимо <a href="/login" class="alert-link">войти</a> в аккаунт или <a href="/register" class="alert-link">зарегистрироваться</a>.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Правая колонка: вывод рецензии -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3>Рецензия на последнее сочинение</h3>
+            </div>
+            <div class="card-body">
+                {% if current_review %}
+                    <h4>Задание:</h4>
+                    <p>{{ current_review.task }}</p>
+                    
+                    <h4>Исходный текст: <button class="btn btn-sm btn-outline-secondary" type="button" data-toggle="collapse" data-target="#collapseSourceText" aria-expanded="false" aria-controls="collapseSourceText">
+                        Показать/скрыть
+                    </button></h4>
+                    <div class="collapse" id="collapseSourceText">
+                        <div class="card card-body mb-3">
+                            {{ current_review.source_text }}
+                        </div>
+                    </div>
+                    
+                    <h4>Текст сочинения: <button class="btn btn-sm btn-outline-secondary" type="button" data-toggle="collapse" data-target="#collapseEssay" aria-expanded="false" aria-controls="collapseEssay">
+                        Показать/скрыть
+                    </button></h4>
+                    <div class="collapse" id="collapseEssay">
+                        <div class="card card-body mb-3">
+                            {{ current_review.text }}
+                        </div>
+                    </div>
+                    
+                    <h4>Рецензия:</h4>
+                    <div id="review-container" class="review-text border p-3 bg-light">
+                        {% if current_review.ai_review %}
+                            {{ current_review.ai_review|safe }}
+                        {% else %}
+                            <div id="streaming-review"></div>
+                            <div class="text-center mt-3" id="loading-indicator">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="sr-only">Генерация рецензии...</span>
+                                </div>
+                                <p>Генерация рецензии...</p>
+                            </div>
+                            
+                            <!-- Скрипт для стриминга рецензии -->
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    const reviewContainer = document.getElementById('streaming-review');
+                                    const loadingIndicator = document.getElementById('loading-indicator');
+                                    
+                                    // Функция для запуска стриминга
+                                    function streamReview() {
+                                        const reviewId = {{ current_review.id }};
+                                        const eventSource = new EventSource('/stream_review/' + reviewId);
+                                        
+                                        // Обработка полученных данных
+                                        eventSource.onmessage = function(event) {
+                                            reviewContainer.innerHTML += event.data;
+                                        };
+                                        
+                                        // Обработка завершения стриминга
+                                        eventSource.onerror = function() {
+                                            eventSource.close();
+                                            loadingIndicator.style.display = 'none';
+                                        };
+                                    }
+                                    
+                                    // Запускаем стриминг
+                                    streamReview();
+                                });
+                            </script>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="text-muted mt-3">
+                        Дата создания: {{ current_review.created_date }}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        {% if current_user.is_authenticated %}
+                            Отправьте сочинение на рецензию, чтобы увидеть результат здесь.
+                        {% else %}
+                            Войдите в аккаунт, чтобы отправлять сочинения на рецензию.
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
