@@ -34,7 +34,7 @@
 - `db/` - директория с файлом базы данных
 
 ## Установка и запуск
-Предварительно необходимо установить ollama[https://ollama.com/]
+Предварительно необходимо установить [ollama](https://ollama.com/)
 Далее, последовательтно введите в cmd (ВАЖНО, отключите VPN):
 ```
 ollama run yandex/YandexGPT-5-Lite-8B-instruct-GGUF
@@ -60,12 +60,7 @@ source .venv/bin/activate  # Для Linux/Mac
 pip install -r requirements.txt
 ```
 
-4. Установите и настройте Ollama для работы с моделями ИИ:
-```
-Инструкции по установке Ollama смотрите на https://ollama.ai/
-```
-
-5. Запустите приложение:
+4. Запустите приложение:
 ```
 python main.py
 ```
