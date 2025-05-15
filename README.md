@@ -35,6 +35,7 @@
 
 ## Установка и запуск
 Предварительно необходимо установить [ollama](https://ollama.com/)
+
 Далее, последовательтно введите в cmd (ВАЖНО, отключите VPN):
 ```
 ollama run yandex/YandexGPT-5-Lite-8B-instruct-GGUF
